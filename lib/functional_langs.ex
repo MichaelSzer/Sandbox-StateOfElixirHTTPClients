@@ -7,6 +7,24 @@ defmodule FunctionalLangs do
 
   @words_looking ~w(wow amazing awesome always theory congrats thanks)
 
+  def loop_until_no_new_child(children_ids, i \\ 0) do
+    all_new_children_ids =
+      for child_id <- Enum.slice(children_ids, i..-1) do
+        {:ok, new_children_ids} = Client.get_comments_ids(child_id)
+
+        new_children_ids
+      end
+      |> Enum.reduce(fn new_children_ids, all_new_children_ids -> all_new_children_ids ++ new_children_ids end)
+
+    Logger.info("New comments: #{length(all_new_children_ids)}")
+
+    if length(all_new_children_ids) > 0 do
+      loop_until_no_new_child(children_ids ++ all_new_children_ids, length(children_ids))
+    else
+      children_ids
+    end
+  end
+
   def generate_report(post_id) do
     {:ok, request_timing_agent} = Agent.start_link(fn -> [] end)
     start_time = System.monotonic_time()
@@ -19,7 +37,8 @@ defmodule FunctionalLangs do
       nil
     )
 
-    {:ok, children_ids} = Client.get_comments_ids(post_id)
+    children_ids = loop_until_no_new_child([Integer.to_string(post_id)])
+    Logger.info("Total Comments in post: ##{length(children_ids)}")
     all_comments_appearance = for child_id <- children_ids do
       text = Client.get_post_text(child_id)
         |> String.downcase()

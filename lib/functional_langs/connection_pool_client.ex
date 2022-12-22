@@ -26,7 +26,8 @@ defmodule FunctionalLangs.ConnectionPoolClient do
   defp extract_children_ids({:ok, %Finch.Response{body: body}}) do
     children_ids = body
       |> JSON.decode!()
-      |> Map.get("kids")
+      |> Map.get("kids", [])
+      |> Enum.map(&(Integer.to_string(&1)))
 
     {:ok, children_ids}
   end
