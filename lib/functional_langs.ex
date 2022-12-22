@@ -16,7 +16,7 @@ defmodule FunctionalLangs do
       end
       |> Enum.reduce(fn new_children_ids, all_new_children_ids -> all_new_children_ids ++ new_children_ids end)
 
-    Logger.info("New comments: #{length(all_new_children_ids)}")
+    #Logger.info("New comments: #{length(all_new_children_ids)}")
 
     if length(all_new_children_ids) > 0 do
       loop_until_no_new_child(children_ids ++ all_new_children_ids, length(children_ids))
@@ -38,7 +38,7 @@ defmodule FunctionalLangs do
     )
 
     children_ids = loop_until_no_new_child([Integer.to_string(post_id)])
-    Logger.info("Total Comments in post: ##{length(children_ids)}")
+    #Logger.info("Total Comments in post: ##{length(children_ids)}")
     all_comments_appearance = for child_id <- children_ids do
       text = Client.get_post_text(child_id)
         |> String.downcase()
