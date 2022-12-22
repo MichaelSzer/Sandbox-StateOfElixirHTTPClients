@@ -1,12 +1,12 @@
 defmodule FunctionalLangs.ConnectionPoolClient do
-  @pool_size 25
+  def pool_size, do: 25
 
   def child_spec() do
     {
       Finch,
       name: __MODULE__,
       pools: %{
-        "https://hacker-news.firebaseio.com" => [size: @pool_size]
+        "https://hacker-news.firebaseio.com" => [size: pool_size()]
       }
     }
   end

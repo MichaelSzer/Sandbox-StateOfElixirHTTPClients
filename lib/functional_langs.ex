@@ -8,13 +8,23 @@ defmodule FunctionalLangs do
   @words_looking ~w(wow amazing awesome always theory congrats thanks)
 
   def loop_until_no_new_child(children_ids, i \\ 0) do
-    all_new_children_ids =
-      for child_id <- Enum.slice(children_ids, i..-1) do
-        {:ok, new_children_ids} = Client.get_comments_ids(child_id)
+    stream =
+      Task.async_stream(
+        Enum.slice(children_ids, i..-1),
+        fn child_id ->
+          {:ok, new_children_ids} = Client.get_comments_ids(child_id)
+          new_children_ids
+        end,
+        max_concurrency: Client.pool_size()
+      )
 
-        new_children_ids
-      end
-      |> Enum.reduce(fn new_children_ids, all_new_children_ids -> all_new_children_ids ++ new_children_ids end)
+    all_new_children_ids = Enum.reduce(
+        stream,
+        [],
+        fn {:ok, new_children_ids}, all_new_children_ids ->
+          all_new_children_ids ++ new_children_ids
+        end
+      )
 
     #Logger.info("New comments: #{length(all_new_children_ids)}")
 
