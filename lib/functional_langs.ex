@@ -20,7 +20,7 @@ defmodule FunctionalLangs do
     )
 
     {:ok, children_ids} = Client.get_comments_ids(post_id)
-    for child_id <- children_ids do
+    all_comments_appearance = for child_id <- children_ids do
       text = Client.get_post_text(child_id)
         |> String.downcase()
 
@@ -31,6 +31,8 @@ defmodule FunctionalLangs do
       end)
     end
 
-
+    Enum.reduce(all_comments_appearance, fn appearance1, appearance2 ->
+      Map.merge(appearance1, appearance2, fn _, map1, map2 -> map1 + map2 end)
+    end)
   end
 end
