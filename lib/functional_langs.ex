@@ -21,7 +21,16 @@ defmodule FunctionalLangs do
 
     {:ok, children_ids} = Client.get_comments_ids(post_id)
     for child_id <- children_ids do
-      Logger.info(Integer.to_string(child_id))
-    end |> Enum.count()
+      text = Client.get_post_text(child_id)
+        |> String.downcase()
+
+      Map.new(@words_looking, fn word ->
+        appearance = String.split(text, word)
+         |> length()
+        {word, appearance - 1}
+      end)
+    end
+
+
   end
 end

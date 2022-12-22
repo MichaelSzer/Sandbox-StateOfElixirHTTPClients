@@ -31,5 +31,15 @@ defmodule FunctionalLangs.ConnectionPoolClient do
     {:ok, children_ids}
   end
 
+  def get_post_text(post_id) do
+    post_id
+    |> get_item()
+    |> extract_post_text()
+  end
 
+  defp extract_post_text({:ok, %Finch.Response{body: body}}) do
+    body
+    |> JSON.decode!()
+    |> Map.get("text", "")
+  end
 end
