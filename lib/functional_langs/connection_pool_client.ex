@@ -16,4 +16,20 @@ defmodule FunctionalLangs.ConnectionPoolClient do
     |> Finch.build("https://hacker-news.firebaseio.com/v0/item/#{item_id}.json")
     |> Finch.request(__MODULE__)
   end
+
+  def get_comments_ids(post_id) do
+    post_id
+    |> get_item()
+    |> extract_children_ids()
+  end
+
+  defp extract_children_ids({:ok, %Finch.Response{body: body}}) do
+    children_ids = body
+      |> JSON.decode!()
+      |> Map.get("kids")
+
+    {:ok, children_ids}
+  end
+
+
 end

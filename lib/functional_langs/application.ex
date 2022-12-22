@@ -10,6 +10,7 @@ defmodule FunctionalLangs.Application do
     children = [
       # Starts a worker by calling: FunctionalLangs.Worker.start_link(arg)
       # {FunctionalLangs.Worker, arg}
+      FunctionalLangs.ConnectionPoolClient.child_spec()
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
